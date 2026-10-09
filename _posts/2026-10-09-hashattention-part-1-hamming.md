@@ -14,7 +14,7 @@ didn't help taught me more than the speedup did.
 
 ## This is part 1 of a series
 
-I'm building HashAttention's decode step from scratch in CUDA, one kernel per post. Part 0 explains why sparse
+I'm building HashAttention's decode step from scratch in CUDA, one kernel per post. [Part 0]({{ site.baseurl }}{% post_url 2026-10-09-hashattention-part-0-why %}) explains why sparse
 attention matters and what the full plan is. The short version:
 
 ```
@@ -109,6 +109,11 @@ Python, including that call, it takes **2.46 ms: 117x faster than version 1 on t
 The speedup has nothing to do with faster math. The kernel reads each key once, does XOR, popcount and subtract
 in a register, and writes each score once. Version 1 made about a hundred passes over memory; this makes one.
 This is called kernel fusion, and it's the main reason people write custom kernels at all.
+
+<video src="{{ site.baseurl }}/assets/part1/passes.mp4" poster="{{ site.baseurl }}/assets/part1/passes-poster.png"
+       controls muted playsinline loop preload="metadata" style="width:100%; border-radius:8px;"
+       aria-label="Animation: the PyTorch loop sweeps the 268 MB array about 100 times, the lookup table about 15, the CUDA kernel once.">
+</video>
 
 Getting there took three bugs, and none of them crashed:
 
@@ -257,6 +262,4 @@ writing two of them.
 Part 2 is top-k: picking the best keys from these scores with a histogram instead of a sort, since a score can
 only be 0 to 32. It's also the kernel the scores could later be fused into, so they never get written at all.
 
-Code: <!-- link to repo once public -->
-
-HashAttention paper: <!-- add arXiv link -->
+HashAttention paper: [arXiv 2412.14468](https://arxiv.org/abs/2412.14468) (Desai et al., ICML 2025).

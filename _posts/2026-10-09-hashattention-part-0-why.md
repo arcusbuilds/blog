@@ -3,14 +3,15 @@ title: "HashAttention from scratch, part 0: why a language model rereads its who
 author: Srijan Keshri
 ---
 
-<!-- Optional: 2-3 sentences on who you are and why you're doing this series. -->
+I'm a backend engineer by day, learning GPU kernels on the side. This series is me building one real piece of
+LLM inference from scratch and writing down what each kernel taught me, including the parts that didn't work.
 
 Every time a language model writes one more token, its attention layers read every key and value it has stored
 for the conversation so far. Token 30,000 rereads all 29,999 before it. The math per token is small, so the GPU
 spends most of that time waiting on memory.
 
 Sparse attention tries to read only the keys that matter. This series builds one sparse attention method,
-HashAttention, from scratch in CUDA: four kernels, one post each, then an end-to-end test against normal
+[HashAttention](https://arxiv.org/abs/2412.14468), from scratch in CUDA: four kernels, one post each, then an end-to-end test against normal
 attention. This post is the map.
 
 ## How much does the model reread?
@@ -84,7 +85,6 @@ Two limits up front:
 - **Random hash first.** HashAttention learns its hash from data. I start with a random projection, which needs no
   training, and treat learned weights as a later step. The kernel is identical either way.
 
-Part 1, the Hamming score kernel, is already done: 117x faster than a PyTorch loop, at 94% of the GPU's memory
+[Part 1]({{ site.baseurl }}{% post_url 2026-10-09-hashattention-part-1-hamming %}), the Hamming score kernel, is already done: 117x faster than a PyTorch loop, at 94% of the GPU's memory
 bandwidth.
 
-<!-- link to part 1 once published -->
