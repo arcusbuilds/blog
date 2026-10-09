@@ -102,7 +102,7 @@ The tables below are the wider idea pool; many rows become sections inside the s
 |---|---|---|
 | 44 | Setting up CUDA on Windows (vcvars, vswhere, the `.\` trap) | ready |
 | 45 | `torch.utils.cpp_extension` failed with `'std': ambiguous`: why and the workaround | ready |
-| 46 | Reading the vAttention paper as a backend engineer | later (paper not read yet) |
+| 46 | Reading the vAttention paper | later (paper not read yet) |
 | 47 | Sparse attention map: Quest, Double Sparsity, HashAttention, MagicPIG | ready |
 | 48 | How I picked which kernels to write (the ladder) | ready |
 | 49 | First look at Nsight Compute | later |

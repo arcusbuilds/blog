@@ -3,7 +3,7 @@ title: "HashAttention from scratch, part 0: why a language model rereads its who
 author: Srijan Keshri
 ---
 
-I'm a backend engineer by day, learning GPU kernels on the side. This series is me building one real piece of
+This series is me building one real piece of
 LLM inference from scratch and writing down what each kernel taught me, including the parts that didn't work.
 
 Every time a language model writes one more token, its attention layers read every key and value it has stored

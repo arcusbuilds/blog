@@ -9,7 +9,7 @@ This week I tried to speed up my CUDA kernel with shared memory.
 
 It got 0% faster.
 
-Some context. I'm a backend engineer learning GPU kernels on the side. My first kernel scores keys for sparse attention: XOR two 32-bit codes, count the bits.
+Some context. I'm learning GPU kernels, and my first kernel scores keys for sparse attention: XOR two 32-bit codes, count the bits.
 
 The PyTorch version took 289 ms on my laptop GPU. My CUDA version took 2.46 ms. 117x faster, same GPU.
 
@@ -63,7 +63,7 @@ Then my CPU comparison said the GPU was 80x faster. Also wrong. The NumPy baseli
 
 What actually made it fast had nothing to do with math. The PyTorch version made around a hundred passes over 268 MB. The kernel makes one. 289 ms down to 2.46 ms.
 
-I'm a backend engineer by day. This is my side project: building HashAttention from scratch, one kernel per post, bugs included.
+This is my side project: building HashAttention from scratch, one kernel per post, bugs included.
 
 Part 0 and part 1 are up. Link in the comments.
 
