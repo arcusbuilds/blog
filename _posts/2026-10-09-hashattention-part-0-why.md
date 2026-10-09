@@ -60,11 +60,12 @@ Then the method keeps the best k keys, say 1,000 out of 32,000, and runs normal 
 ## The four kernels
 
 ```
- query vector -> 32-bit code      encoder           part 4
- compare with every key's code    Hamming score     part 1
- keep the best k keys             top-k             part 2
- attention over only those keys   sparse attention  part 3
- all four at Llama-3.1-8B shapes  end to end        part 5
+ step  what happens                      kernel            written up in
+ 1     query vector -> 32-bit code       encoder           part 4
+ 2     compare with every key's code     Hamming score     part 1
+ 3     keep the best k keys              top-k             part 2
+ 4     attention over only those keys    sparse attention  part 3
+       all four at Llama-3.1-8B shapes   end to end        part 5
 ```
 
 | Part | Kernel | What's new in CUDA terms |
