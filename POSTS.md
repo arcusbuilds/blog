@@ -10,7 +10,7 @@ Scope = HashAttention only. vAttention sampling, Quest, Double Sparsity are out 
 | Part | Post | Status |
 |---|---|---|
 | 0 | Why a language model rereads its whole memory for every word (the map) | `_posts/2026-10-09-hashattention-part-0-why.md` |
-| 1 | Hash encoder (GEMV + ballot bit-pack) | next kernel to build |
+| 1 | Hash encoder: one warp, 32 votes, one code | outline `_drafts/hashattention-part-1-encoder.md`; kernel scaffold ready (encoder.py / encoder.cu) |
 | 2 | Hamming score: 117x faster than PyTorch, then 0% with shared memory | `_posts/2026-10-09-hashattention-part-2-hamming.md` |
 | 3 | Top-k by histogram | kernel in progress (phase 1 TODO). Include: histogram in global memory vs shared memory (vote-counting analogy: main-office board vs classroom board), both measured; race condition demo (`++` vs `atomicAdd`) |
 | 4 | Sparse attention (gather + online softmax + split-K) | later |

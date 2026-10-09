@@ -52,6 +52,19 @@ HashAttention turns every key into a 32-bit code: a short fingerprint where simi
 The query gets a code too. Comparing two codes means counting how many of their 32 bits match, which a GPU does
 in one instruction.
 
+Making a code is simple. Multiply the 128-number vector by a fixed 128 x 32 matrix, which gives 32 numbers, and
+keep only the sign of each one: positive becomes 1, negative becomes 0. Two similar vectors land on the same
+side for most of the 32, so their codes share most of their bits:
+
+```
+key A      [ 2.0, 1.0, ...]  ->  x W  ->  [ 0.8, -0.5, 1.1, -0.2, ...]  ->  1 0 1 0 ...
+key B      [ 1.9, 1.2, ...]  ->  x W  ->  [ 0.9, -0.3, 1.0, -0.4, ...]  ->  1 0 1 0 ...   (similar to A)
+```
+
+The matrix can be random, an old trick called SimHash, or learned from data, which is what HashAttention does
+so that the keys that score well really are the ones attention needs. Keys get their code once, when they're
+added to the cache. The query gets one per step.
+
 The saving is in what gets read. A full key for one head is 128 numbers, 256 bytes. Its code is 4 bytes. Scoring
 every key by its code reads 64 times less memory than scoring it with the full vectors.
 
