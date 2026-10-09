@@ -1,0 +1,7 @@
+title: arcusbuilds
+description: GPU kernels, one speedup at a time.
+theme: minima
+markdown: kramdown
+exclude:
+  - POSTS.md
+  - README.md
