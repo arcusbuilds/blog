@@ -1,4 +1,5 @@
 ---
+date: 2026-10-09 10:00:00 +0530
 title: "HashAttention from scratch, part 2: 117x faster than PyTorch, then 0% faster with shared memory"
 author: Srijan Keshri
 ---

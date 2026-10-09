@@ -36,17 +36,6 @@ $mono: "Cascadia Mono", "Cascadia Code", ui-monospace, SFMono-Regular, Menlo, Co
   --shadow: 0 1px 2px rgba(40, 30, 10, .08), 0 8px 24px -12px rgba(40, 30, 10, .25);
   color-scheme: light;
 }
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #14171c; --surface: #1b1f25; --text: #e8e3d8; --muted: #a29c91; --border: #2a2f37;
-    --link: #8fb9f5; --link-hover: #bcd5fa; --link-line: #3a5378;
-    --amber-text: #f5a524; --green-text: #2dd4a0; --pill-slow-bg: #3a2a10; --pill-slow-fg: #f5a524; --pill-fast-bg: #0f3a2e; --pill-fast-fg: #2dd4a0;
-    --code-inline-bg: #1f242c; --code-inline-fg: #e8e3d8;
-    --code-edge: #232830; --th-bg: #1c2027; --zebra: #191d23; --rule: #4a505a;
-    --selection: #2c405e; --shadow: none;
-    color-scheme: dark;
-  }
-}
 
 // ---- base ----
 body {
@@ -54,6 +43,9 @@ body {
   font-optical-sizing: auto; text-rendering: optimizeLegibility;
 }
 ::selection { background: var(--selection); }
+// minima colors every link with the Sass $brand-color, which is unreadable on the dark background.
+a, a:visited { color: var(--link); }
+a:hover { color: var(--link-hover); }
 .wrapper { max-width: 680px; padding-left: 16px; padding-right: 16px; }
 
 // ---- header / footer ----
@@ -69,12 +61,21 @@ body {
 .site-nav .page-link:hover { color: var(--text); text-decoration: none; }
 .site-nav .menu-icon > svg path { fill: var(--muted); }
 .site-footer { border-top: 1px solid var(--border); font-family: $sans; }
-.footer-heading, .footer-col-wrapper, .site-footer .svg-icon { color: var(--muted); fill: var(--muted); }
+.footer-col-wrapper, .site-footer .svg-icon { color: var(--muted); fill: var(--muted); font-size: 14px; }
+// minima repeats the site title in the footer heading and first column; keep only the description.
+.footer-heading, .footer-col-1, .footer-col-2 { display: none; }
 
 // ---- home list ----
 .page-heading, .post-list-heading { font-family: $sans; font-weight: 600; }
-.post-link { font-family: $sans; font-weight: 600; letter-spacing: -.012em; }
+.post-list-heading { font-size: 15px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+.post-list > li { margin-bottom: 28px; }
+.post-link, .post-link:visited {
+  display: block; font: 600 22px/1.3 $sans; letter-spacing: -.012em; color: var(--text); text-wrap: balance;
+}
+.post-link:hover { color: var(--link); text-decoration: none; }
 .post-meta { font-family: $sans; color: var(--muted); }
+// The raw feed looks like an error page in a browser; feed readers still find it via <link rel="alternate"> in <head>.
+.rss-subscribe { display: none; }
 
 // ---- post ----
 .page-content { padding: 56px 0 64px; }
@@ -158,3 +159,5 @@ pre.highlight {
 
 blockquote { color: var(--muted); border-left-color: var(--border); letter-spacing: 0; }
 hr { border: 0; height: 1px; background: var(--border); margin: 48px 0; }
+.site-footer .footer-col-3 { width: 100%; float: none; padding-left: 0; }
+.footer-col-wrapper { margin-left: 0; }

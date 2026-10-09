@@ -1,4 +1,5 @@
 ---
+date: 2026-10-09 12:00:00 +0530
 title: "HashAttention from scratch, part 0: why a language model rereads its whole memory for every word"
 author: Srijan Keshri
 ---
