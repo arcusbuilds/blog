@@ -15,7 +15,7 @@ didn't help taught me more than the speedup did.
 ## This is part 1 of a series
 
 I'm building one sparse-attention decode step from scratch, one kernel at a time, and writing up each kernel as I
-go. The full step has three stages:
+go. The simplest version, the one from the HashAttention paper, has three stages:
 
 ```
 new query + all cached keys
@@ -33,9 +33,17 @@ new query + all cached keys
  output, close to full attention at a fraction of the reads
 ```
 
-Along the way I'll also write two other ways to do stage 1 (Quest's page scoring and Double Sparsity's
-channel scoring) and vAttention's method for deciding how large k needs to be. The last post chains stages 1, 2
-and 3 at Llama-3.1-8B shapes and compares speed and accuracy against dense attention.
+That's the minimum, and it leaves two things out. First, the scores need 32-bit codes to exist: a small learned
+hash turns the query and each new key into bits, and that encoder is a kernel of its own. Second, vAttention
+(Desai et al., arXiv 2510.05688), the paper that got me into this, adds more steps after scoring. It always keeps
+the first few tokens and a window of recent ones, picks the top-k, then randomly samples from the keys that are
+left. It uses the mean and variance of a small sample to decide how many samples it needs for a target error, and
+gives the sampled keys extra weight in the softmax so they stand in for the ones it skipped. That sampling step is
+where its error guarantee comes from.
+
+So the series covers both: the three-stage HashAttention pipeline first, then the vAttention additions. I'll
+also write two other ways to do stage 1 (Quest's page scoring and Double Sparsity's channel scoring). The last
+post chains everything at Llama-3.1-8B shapes and compares speed and accuracy against dense attention.
 
 | Part | Kernel | Stage |
 |---|---|---|
@@ -43,9 +51,10 @@ and 3 at Llama-3.1-8B shapes and compares speed and accuracy against dense atten
 | 2 | Page scoring (Quest) | 1, alternative |
 | 3 | Channel scoring (Double Sparsity) | 1, alternative |
 | 4 | Top-k by histogram | 2 |
-| 5 | Sample budget (vAttention) | 2, add-on |
-| 6 | Sparse FlashDecoding | 3 |
-| 7 | The whole step, end to end | 1 to 3 |
+| 5 | Sample budget and random sampling (vAttention) | 2, add-on |
+| 6 | Sparse FlashDecoding with sample weights | 3 |
+| 7 | Hash encoder: query and keys to 32-bit codes | before 1 |
+| 8 | The whole step, end to end | all |
 
 ## The kernel: Hamming scores for HashAttention
 
