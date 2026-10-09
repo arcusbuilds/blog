@@ -81,7 +81,7 @@ class CacheBlog(Scene):
         def sweep(n, dur, opacity=0.6):
             w = right_edge(n) - left
             hl = Rectangle(width=w, height=bh - 0.1, stroke_width=0, fill_color=SLOW, fill_opacity=opacity)
-            hl.move_to([left + w / 2, by, 0])
+            hl.move_to([left + w / 2, by, 0]).set_z_index(1)
             self.play(GrowFromEdge(hl, LEFT), run_time=dur, rate_func=linear)
             return hl
 
@@ -119,7 +119,7 @@ class CacheBlog(Scene):
         live = always_redraw(lambda: counter_group(max(1, int(p.get_value()))))
         self.add(live)
         glow = Rectangle(width=bw, height=bh - 0.1, stroke_width=0, fill_color=SLOW, fill_opacity=0.0)
-        glow.move_to([0, by, 0])
+        glow.move_to([0, by, 0]).set_z_index(1)
         self.add(glow)
         self.play(LaggedStart(*[FadeIn(c, scale=0.6) for c in cells[n_solo:]], lag_ratio=0.15),
                   p.animate.set_value(32768), glow.animate.set_fill(SLOW, opacity=0.5),
@@ -163,11 +163,11 @@ class CacheBlog(Scene):
         less = T("64x less to read", L["count"], FAST, BOLD).move_to(cpos)
         self.play(Transform(full, tiny), ReplacementTransform(lab1, lab2), run_time=1.1, rate_func=smooth)
         self.play(FadeIn(less, shift=UP * 0.2), run_time=0.5)
-        self.wait(L["hold"] + 0.4)
+        self.wait(L["hold"] + 1.0)
 
         # --- end card (all text high contrast)
-        title = self.fit(T("HashAttention from scratch", L["head"] + 12, FG, BOLD), config.frame_width - 1.0)
-        subt = self.fit(T("4 CUDA kernels. Part 0: the map.", L["big"] + 4, FAST, BOLD), config.frame_width - 1.0)
+        title = self.fit(T("HashAttention from scratch", L["head"] + 12, FG, BOLD), config.frame_width - 0.6)
+        subt = self.fit(T("4 CUDA kernels. Part 0: the map.", L["big"] + 4, FAST, BOLD), config.frame_width - 0.6)
         end = VGroup(title, subt).arrange(DOWN, buff=0.45).move_to(ORIGIN)
         self.play(FadeOut(VGroup(head, full, lab2, less, foot)), run_time=0.6)
         self.play(FadeIn(title, shift=UP * 0.2), run_time=0.6)
@@ -178,7 +178,7 @@ class CacheBlog(Scene):
 class CacheSquare(CacheBlog):
     SQ = True
     L = dict(
-        head=40, sub=26, cap=24, count=46, foot=18, big=32, key=26,
+        head=40, sub=28, cap=24, count=56, foot=20, big=34, key=32,
         n_tok=10, bar_w=7.0, bar_h=1.0, bar_y=0.8, head_y=3.0, cdy=1.5, solo=3,
         t_step=0.4, t_fill=1.8, hold=0.4, t_end=3.2, show_ms=False,
     )

@@ -1,7 +1,13 @@
 title: arcusbuilds
 description: GPU kernels, one speedup at a time.
+url: https://arcusbuilds.github.io
+baseurl: /blog
 theme: minima
 markdown: kramdown
+plugins:
+  - jekyll-feed
+  - jekyll-seo-tag
+goatcounter: ""  # site code from goatcounter.com, e.g. "arcusbuilds"; empty = analytics off
 exclude:
   - POSTS.md
   - README.md
