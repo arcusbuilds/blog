@@ -77,14 +77,12 @@ can be tested with random codes, and that keeps the main path moving.
 Each part gets a PyTorch reference first, then the CUDA kernel, checked against the reference on every run, then
 timings with Nsight Compute and the same "how close is this to the hardware limit" question as part 1.
 
-Three limits up front:
+Two limits up front:
 
 - **Random weights, real shapes.** An 8 GB laptop GPU can't hold Llama-3.1-8B, so I use random tensors with its
   layer shapes. That's enough to measure speed. It says nothing about answer quality in a real model.
 - **Random hash first.** HashAttention learns its hash from data. I start with a random projection, which needs no
   training, and treat learned weights as a later step. The kernel is identical either way.
-- **HashAttention only.** vAttention, the paper that got me into this, adds random sampling on top to give an
-  error guarantee. Quest and Double Sparsity pick keys in other ways. All three are out of scope for this series.
 
 Part 1, the Hamming score kernel, is already done: 117x faster than a PyTorch loop, at 94% of the GPU's memory
 bandwidth.
