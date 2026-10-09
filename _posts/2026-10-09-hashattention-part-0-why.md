@@ -23,8 +23,8 @@ Take Llama-3.1-8B. Its attention has 32 layers, 8 key/value heads per layer, and
 32 layers x 8 heads x 128 numbers x 2 (key and value) x 2 bytes = 131,072 bytes = 128 KB per token
 ```
 
-At a 32K-token context that's 4 GB, and generating the next token reads all of it. My laptop GPU (RTX 2000 Ada,
-256 GB/s) would need about 17 ms just to move those bytes, for every single token, before doing any math.
+At a 32K-token context that's **4 GB**{: .slow}, and generating the next token reads all of it. My laptop GPU (RTX 2000 Ada,
+256 GB/s) would need **about 17 ms**{: .slow} just to move those bytes, for every single token, before doing any math.
 That's arithmetic from the model's shapes, not a measurement.
 
 <video src="{{ site.baseurl }}/assets/part0/cache.mp4" poster="{{ site.baseurl }}/assets/part0/cache-poster.png"
@@ -65,8 +65,8 @@ The matrix can be random, an old trick called SimHash, or learned from data, whi
 so that the keys that score well really are the ones attention needs. Keys get their code once, when they're
 added to the cache. The query gets one per step.
 
-The saving is in what gets read. A full key for one head is 128 numbers, 256 bytes. Its code is 4 bytes. Scoring
-every key by its code reads 64 times less memory than scoring it with the full vectors.
+The saving is in what gets read. A full key for one head is 128 numbers, 256 bytes. Its code is **4 bytes**{: .fast}. Scoring
+every key by its code reads **64 times less**{: .fast} memory than scoring it with the full vectors.
 
 Then the method keeps the best k keys, say 1,000 out of 32,000, and runs normal attention on just those.
 

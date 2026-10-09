@@ -69,7 +69,7 @@ for i in range(32):
 
 `q[:, None]` turns the query list into a column, and broadcasting stretches it across each row of keys.
 
-It's correct, and on the GPU it takes **289 ms**. Each line inside the loop is a separate GPU kernel that reads
+It's correct, and on the GPU it takes **289 ms**{: .slow}. Each line inside the loop is a separate GPU kernel that reads
 the full 268 MB grid and writes a result back. 32 iterations of several kernels each means roughly a hundred
 full trips through memory (my count from the code, not a profiler number).
 
@@ -90,7 +90,7 @@ mismatches = (LUT[x & 255] + LUT[(x >> 8) & 255]
 score = 32 - mismatches
 ```
 
-**61 ms**, 4.7x faster than version 1, without writing a kernel. It's still about 15 separate kernels, each
+**61 ms**{: .slow}, 4.7x faster than version 1, without writing a kernel. It's still about 15 separate kernels, each
 making its own pass over the data, so it's a real improvement but nowhere near the hardware.
 
 ## Version 3: one CUDA thread per key (2.46 ms)
@@ -106,7 +106,7 @@ __global__ void hamming_kernel(const int* q, const int* k, int* out, int H, int 
 ```
 
 The kernel is built into a DLL with `nvcc --shared` and called from Python through `ctypes`. Measured from
-Python, including that call, it takes **2.46 ms: 117x faster than version 1 on the same GPU.**
+Python, including that call, it takes **2.46 ms**{: .fast}: **117x**{: .fast} faster than version 1 on the same GPU.
 
 The speedup has nothing to do with faster math. The kernel reads each key once, does XOR, popcount and subtract
 in a register, and writes each score once. Version 1 made about a hundred passes over memory; this makes one.
@@ -166,8 +166,8 @@ min and max. CPU work is split into 1 MB chunks so temporaries stay in cache, an
 
 | Case (67M keys, 537 MB moved) | Median | Min | Max | GB/s | GPU faster by |
 |---|---|---|---|---|---|
-| GPU, CUDA kernel | 2.54 ms | 2.53 ms | 2.55 ms | 212 | |
-| CPU, NumPy, 1 thread | 87.4 ms | 82.5 ms | 91.9 ms | 6 | 34x |
+| GPU, CUDA kernel | **2.54 ms**{: .fast} | 2.53 ms | 2.55 ms | 212 | |
+| CPU, NumPy, 1 thread | **87.4 ms**{: .slow} | 82.5 ms | 91.9 ms | 6 | 34x |
 | CPU, NumPy, 8 threads | 23.8 ms | 22.9 ms | 46.9 ms | 23 | 9.4x |
 | CPU, plain copy, 8 threads | 10.3 ms | 9.9 ms | 11.1 ms | 52 | 4.1x |
 
@@ -250,9 +250,9 @@ The kernel can only get faster by moving fewer bytes. These are predictions; I h
 
 ## Where the time went
 
-- PyTorch loop: 289 ms. About a hundred passes over memory.
-- Lookup table: 61 ms. About 15 passes.
-- CUDA with `__popc`: 2.46 ms, one pass, 94% of DRAM bandwidth according to Nsight Compute.
+- PyTorch loop: **289 ms**{: .slow}. About a hundred passes over memory.
+- Lookup table: **61 ms**{: .slow}. About 15 passes.
+- CUDA with `__popc`: **2.46 ms**{: .fast}, one pass, 94% of DRAM bandwidth according to Nsight Compute.
 - Shared memory and constant memory: 0% gain, because they don't reduce bytes read from DRAM.
 - CPU vs GPU: 34x against single-threaded NumPy, 9.4x against 8 threads, and a measured ceiling of about 4x set
   by memory bandwidth (52 GB/s CPU vs 212 GB/s GPU).

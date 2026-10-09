@@ -13,6 +13,7 @@ exclude:
   - README.md
   - social
   - animations
+  - design
   - Gemfile
   - Gemfile.lock
   - vendor

@@ -1,0 +1,160 @@
+---
+# Only the main Sass file needs front matter (the dashes are enough)
+---
+// Design B, "Paper". Drop-in for assets/main.scss (minima 2.5.1).
+
+// One Google Font. Moving this to a <link> in _includes/head.html loads a bit faster.
+@import url("https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap");
+
+// Sass vars get the light hex values because minima runs darken()/lighten() on them.
+// Runtime colors (light + dark) come from the CSS custom properties below.
+$base-font-family: "Source Serif 4", Charter, "Bitstream Charter", "Sitka Text", Cambria, Georgia, serif;
+$base-font-size:   19px;
+$base-line-height: 1.7;
+$text-color:       #1c1a16;
+$background-color: #fbf9f4;
+$brand-color:      #1d4f91;
+$grey-color:       #5f594f;
+$grey-color-light: #e2dccf;
+$grey-color-dark:  #3d3830;
+$content-width:    712px;  // 680px text column + 2 x 16px gutter
+
+@import "minima";
+
+$sans: "Segoe UI", system-ui, -apple-system, Roboto, "Helvetica Neue", Arial, sans-serif;
+$mono: "Cascadia Mono", "Cascadia Code", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+// ---- tokens ----
+:root {
+  --bg: #fbf9f4; --surface: #f3efe6; --text: #1c1a16; --muted: #5f594f; --border: #e2dccf;
+  --link: #1d4f91; --link-hover: #0f2f5c; --link-line: #b9c8dc;
+  --amber: #f5a524; --amber-text: #8a5300; --green: #2dd4a0; --green-text: #0a6c4e; --pill-slow-bg: #fde7bf; --pill-slow-fg: #6b3f00; --pill-fast-bg: #c8f3e3; --pill-fast-fg: #05513a;
+  --code-inline-bg: #efe9dc; --code-inline-fg: #2b2620;
+  --code-bg: #0e1116; --code-fg: #e6e1d6; --code-edge: transparent;
+  --th-bg: #efeadf; --zebra: #f5f1e8; --rule: #1c1a16;
+  --selection: #d6e2f3;
+  --shadow: 0 1px 2px rgba(40, 30, 10, .08), 0 8px 24px -12px rgba(40, 30, 10, .25);
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #14171c; --surface: #1b1f25; --text: #e8e3d8; --muted: #a29c91; --border: #2a2f37;
+    --link: #8fb9f5; --link-hover: #bcd5fa; --link-line: #3a5378;
+    --amber-text: #f5a524; --green-text: #2dd4a0; --pill-slow-bg: #3a2a10; --pill-slow-fg: #f5a524; --pill-fast-bg: #0f3a2e; --pill-fast-fg: #2dd4a0;
+    --code-inline-bg: #1f242c; --code-inline-fg: #e8e3d8;
+    --code-edge: #232830; --th-bg: #1c2027; --zebra: #191d23; --rule: #4a505a;
+    --selection: #2c405e; --shadow: none;
+    color-scheme: dark;
+  }
+}
+
+// ---- base ----
+body {
+  background: var(--bg); color: var(--text);
+  font-optical-sizing: auto; text-rendering: optimizeLegibility;
+}
+::selection { background: var(--selection); }
+.wrapper { max-width: 680px; padding-left: 16px; padding-right: 16px; }
+
+// ---- header / footer ----
+.site-header {
+  border-top: 3px solid; border-image: linear-gradient(90deg, var(--amber), var(--green)) 1;
+  border-bottom: 1px solid var(--border);
+}
+.site-title, .site-title:visited {
+  font: 600 18px/56px $sans; letter-spacing: -.01em; color: var(--text);
+}
+.site-nav { font-family: $sans; font-size: 15px; line-height: 56px; background-color: var(--bg); border-color: var(--border); }
+.site-nav .page-link { color: var(--muted); }
+.site-nav .page-link:hover { color: var(--text); text-decoration: none; }
+.site-nav .menu-icon > svg path { fill: var(--muted); }
+.site-footer { border-top: 1px solid var(--border); font-family: $sans; }
+.footer-heading, .footer-col-wrapper, .site-footer .svg-icon { color: var(--muted); fill: var(--muted); }
+
+// ---- home list ----
+.page-heading, .post-list-heading { font-family: $sans; font-weight: 600; }
+.post-link { font-family: $sans; font-weight: 600; letter-spacing: -.012em; }
+.post-meta { font-family: $sans; color: var(--muted); }
+
+// ---- post ----
+.page-content { padding: 56px 0 64px; }
+.post-header { margin-bottom: 40px; }
+.post-title { font: 650 36px/1.18 $sans; letter-spacing: -.022em; text-wrap: balance; }
+.post-content {
+  h1, h2, h3, h4 { font-family: $sans; font-weight: 600; letter-spacing: -.012em; line-height: 1.3; }
+  h2 { font-size: 23px; margin: 2.2em 0 .6em; }
+  h3 { font-size: 19px; margin: 1.8em 0 .5em; }
+  strong { font-weight: 600; }
+  a, a:visited {
+    color: var(--link); text-decoration: underline; text-decoration-color: var(--link-line);
+    text-decoration-thickness: 1px; text-underline-offset: .18em;
+  }
+  a:hover { color: var(--link-hover); text-decoration-color: currentColor; }
+}
+@include media-query($on-palm) {
+  body { font-size: 17px; }
+  .post-title { font-size: 28px; }
+}
+
+// Meaning colors, opt-in from Markdown: <span class="slow">289 ms</span>, <span class="fast">2.46 ms</span>.
+// Amber = slow / reads everything. Green = fast / reads little. Never use them for anything else.
+.slow, .fast { font-weight: 600; font-variant-numeric: tabular-nums; padding: 0.05em 0.4em; border-radius: 5px; white-space: nowrap; }
+.slow { color: var(--pill-slow-fg); background: var(--pill-slow-bg); }
+.fast { color: var(--pill-fast-fg); background: var(--pill-fast-bg); }
+
+// ---- code ----
+pre, code { font-family: $mono; border: 0; background-color: transparent; }
+code { font-size: .84em; padding: .12em .36em; border-radius: 4px; background: var(--code-inline-bg); color: var(--code-inline-fg); }
+.highlighter-rouge .highlight, .highlight {
+  background: var(--code-bg); border: 1px solid var(--code-edge); border-radius: 6px; box-shadow: var(--shadow);
+}
+pre.highlight {
+  margin: 0; padding: 18px 20px; border: 0; box-shadow: none; color: var(--code-fg);
+  font-size: 13px; line-height: 1.7; tab-size: 4;
+  > code { background: none; color: inherit; padding: 0; font-size: inherit; }
+  &::selection, & *::selection { background: #2c405e; }
+}
+
+// Rouge: same palette in both modes, because code blocks stay dark.
+// The reset (0,2,1) beats minima's `.highlight .x` (0,2,0); the token rules (0,3,0) beat the reset.
+.post-content .highlight span { color: inherit; background: none; font-weight: 400; font-style: normal; }
+.post-content .highlight {
+  .c, .c1, .cm, .cs, .ch, .cd { color: #8b949e; font-style: italic; }
+  .cp, .cpf                   { color: #8b949e; }
+  .k, .kd, .kn, .kr, .kc, .kp, .ow { color: #ff7b72; }
+  .kt, .nc                    { color: #79c0ff; }
+  .nf, .fm, .nb, .bp          { color: #ffd8b5; }
+  .m, .mi, .mf, .mh, .mo, .mb, .il { color: #79c0ff; }
+  .s, .s1, .s2, .sa, .sb, .sc, .sd, .se, .sh, .si, .sx, .ss { color: #a5d6ff; }
+  .o, .p                      { color: #c9d1d9; }
+  .n, .nv, .na, .nx, .ni, .nl, .nn, .py, .vc, .vg, .vi { color: #e6e1d6; }
+  .err                        { color: #79c0ff; }
+  .gd                         { color: #79c0ff; }
+  .gi                         { color: #79c0ff; }
+}
+
+// ---- tables: booktabs rules, not boxes ----
+.post-content table {
+  font: 400 15px/1.45 $sans; font-variant-numeric: tabular-nums; color: var(--text);
+  border: 0; border-top: 1.5px solid var(--rule); border-bottom: 1.5px solid var(--rule);
+  tr:nth-child(even) { background-color: transparent; }
+  tbody tr:nth-child(even) { background-color: var(--zebra); }
+  th { font-weight: 600; background-color: var(--th-bg); border: 0; border-bottom: 1px solid var(--rule); }
+  td { border: 0; border-bottom: 1px solid var(--border); }
+  tbody tr:last-child td { border-bottom: 0; }
+  th, td { padding: 9px 14px; vertical-align: top; }
+}
+
+// ---- media ----
+.post-content video { display: block; aspect-ratio: 16 / 9; background: var(--code-bg); box-shadow: var(--shadow); }
+
+// Code, tables and video run 40px wider than the text column on wide screens.
+@media (min-width: 820px) {
+  .post-content > .highlighter-rouge, .post-content > table, .post-content > video { margin-left: -40px; margin-right: -40px; }
+  .post-content > table { width: calc(100% + 80px); }
+  // ponytail: !important beats the inline style="width:100%" the posts put on <video>
+  .post-content > video { width: calc(100% + 80px) !important; }
+}
+
+blockquote { color: var(--muted); border-left-color: var(--border); letter-spacing: 0; }
+hr { border: 0; height: 1px; background: var(--border); margin: 48px 0; }
