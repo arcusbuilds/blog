@@ -53,7 +53,7 @@ Part 0 is the map. Link in the comments.
 
 ## Draft C: build log with a confession (goal: comments + likes)
 
-Earlier this week I read a paper on sparse attention.
+Earlier this week I started learning how sparse attention works.
 
 Now I have a CUDA kernel running at 94% of my laptop GPU's memory bandwidth.
 

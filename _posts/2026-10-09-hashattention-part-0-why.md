@@ -27,6 +27,11 @@ At a 32K-token context that's 4 GB, and generating the next token reads all of i
 256 GB/s) would need about 17 ms just to move those bytes, for every single token, before doing any math.
 That's arithmetic from the model's shapes, not a measurement.
 
+<video src="{{ site.baseurl }}/assets/part0/cache.mp4" poster="{{ site.baseurl }}/assets/part0/cache-poster.png"
+       controls muted playsinline loop preload="metadata" style="width:100%; border-radius:8px;"
+       aria-label="Animation: the key/value cache grows one token at a time and every new token rereads all of it, reaching 4 GB at 32K tokens; a 256-byte key shrinks to a 4-byte code.">
+</video>
+
 To be fair about it: the model's weights are 16 GB and also get read once per token, so for one conversation at
 32K tokens the cache is the smaller cost. The cache wins when contexts get longer or when a server runs many
 conversations at once, because each conversation has its own cache but they all share one copy of the weights.

@@ -26,7 +26,7 @@ def size_str(n):  # n tokens * 128 KB
         return f"{kb} KB"
     if kb < 1024 * 1024:
         return f"{kb / 1024:.0f} MB"
-    return f"{kb / 1048576:.0f} GB"
+    return f"{kb / 1048576:.2f}".rstrip("0").rstrip(".") + " GB"  # 3.66 GB mid-race, exactly 4 GB at 32K
 
 
 class CacheBlog(Scene):
