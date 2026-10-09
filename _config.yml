@@ -7,7 +7,7 @@ markdown: kramdown
 plugins:
   - jekyll-feed
   - jekyll-seo-tag
-goatcounter: ""  # site code from goatcounter.com, e.g. "arcusbuilds"; empty = analytics off
+goatcounter: "arcus"  # site code from goatcounter.com, e.g. "arcusbuilds"; empty = analytics off
 exclude:
   - POSTS.md
   - README.md
