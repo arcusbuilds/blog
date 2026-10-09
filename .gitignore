@@ -1,3 +1,4 @@
 .anim-venv/
 animations/out/
 media/
+__pycache__/
