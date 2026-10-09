@@ -26,7 +26,7 @@ attention matters and what the full plan is. The short version:
  5     all four at Llama-3.1-8B shapes   end to end
 ```
 
-Part 1 builds the encoder that makes the 32-bit codes. This post assumes the codes exist and tests with random ones.
+Part 1 (coming soon) builds the encoder that makes the 32-bit codes. This post assumes the codes exist and tests with random ones.
 The series stops at HashAttention. vAttention's sampling and the Quest and Double Sparsity scorers are out of
 scope for now.
 

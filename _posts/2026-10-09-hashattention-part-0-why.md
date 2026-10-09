@@ -28,9 +28,9 @@ At a 32K-token context that's **4 GB**{: .slow}, and generating the next token r
 256 GB/s) would need **about 17 ms**{: .slow} just to move those bytes, for every single token, before doing any math.
 That's arithmetic from the model's shapes, not a measurement.
 
-<video src="{{ site.baseurl }}/assets/part0/cache.mp4" poster="{{ site.baseurl }}/assets/part0/cache-poster.png"
+<video src="{{ site.baseurl }}/assets/part0/library.mp4" poster="{{ site.baseurl }}/assets/part0/library-poster.png"
        controls muted playsinline loop preload="metadata" style="width:100%; border-radius:8px;"
-       aria-label="Animation: the key/value cache grows one token at a time and every new token rereads all of it, reaching 4 GB at 32K tokens; a 256-byte key shrinks to a 4-byte code.">
+       aria-label="Animation: an LLM rereads every book on a shelf (every stored key) to write one word. A small label on each spine stands in for the book: a 256-byte key becomes a 4-byte code, 64x less to read.">
 </video>
 
 To be fair about it: the model's weights are 16 GB and also get read once per token, so for one conversation at
@@ -105,5 +105,5 @@ Two limits up front:
   training, and treat learned weights as a later step. The kernel is identical either way.
 
 [Part 2]({{ site.baseurl }}{% post_url 2026-10-09-hashattention-part-2-hamming %}), the Hamming score kernel, is already done: 117x faster than a PyTorch loop, at 94% of the GPU's memory
-bandwidth.
+bandwidth. Part 1, the encoder, is coming soon.
 
