@@ -1,6 +1,6 @@
 # LinkedIn launch drafts (series: HashAttention from scratch, parts 0 + 1)
 
-First comment on all: "Part 0 (why) and part 1 (the kernel): https://arcusbuilds.github.io/blog/"
+First comment on all: "Part 0 (why) and part 2 (the kernel): https://arcusbuilds.github.io/blog/"
 Media: `animations/out/part1_passes_square.mp4` (1:1) for drafts A and C, `part0_cache_square.mp4` for draft B.
 
 ## Draft A: failure-first (goal: comments)
@@ -21,7 +21,7 @@ Nsight had already told me why, and I hadn't listened. DRAM was 94% busy. The qu
 
 The lesson I'm keeping: find out which limit you're hitting before you optimize. If it's memory, only moving fewer bytes helps.
 
-This is part 1 of a series where I build HashAttention from scratch in CUDA, one kernel per post. Part 0 explains why it matters.
+This is part 2 of a series where I build HashAttention from scratch in CUDA, one kernel per post. Part 0 explains why it matters.
 
 What's an optimization you were sure would work, and didn't?
 
@@ -65,7 +65,7 @@ What actually made it fast had nothing to do with math. The PyTorch version made
 
 This is my side project: building HashAttention from scratch, one kernel per post, bugs included.
 
-Part 0 and part 1 are up. Link in the comments.
+Part 0 and part 2 are up. Link in the comments.
 
 What's the most convincing wrong number you've ever measured?
 

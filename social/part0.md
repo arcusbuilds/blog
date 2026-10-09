@@ -14,7 +14,7 @@ Sparse attention bets that most of those stored keys barely matter. The hard par
 
 HashAttention does it with 32-bit fingerprints: 4 bytes per key instead of 256, so 64x less to read.
 
-I'm building it from scratch in CUDA, 4 kernels, one post each. Part 0 is the map. Part 1 is next: my kernel ran 117x faster than PyTorch, and then shared memory made it 0% faster.
+I'm building it from scratch in CUDA, 4 kernels, one post each. Part 0 is the map. Part 2 is the scoring kernel: it ran 117x faster than PyTorch, and then shared memory made it 0% faster.
 
 Link in the first comment.
 

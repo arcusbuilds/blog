@@ -1,5 +1,5 @@
 ---
-title: "HashAttention from scratch, part 1: 117x faster than PyTorch, then 0% faster with shared memory"
+title: "HashAttention from scratch, part 2: 117x faster than PyTorch, then 0% faster with shared memory"
 author: Srijan Keshri
 ---
 
@@ -12,21 +12,21 @@ a single CUDA instruction per key, and it runs at 94% of my GPU's memory bandwid
 classic CUDA optimizations, shared memory and constant memory, and measured exactly zero gain. Working out why they
 didn't help taught me more than the speedup did.
 
-## This is part 1 of a series
+## This is part 2 of a series
 
 I'm building HashAttention's decode step from scratch in CUDA, one kernel per post. [Part 0]({{ site.baseurl }}{% post_url 2026-10-09-hashattention-part-0-why %}) explains why sparse
 attention matters and what the full plan is. The short version:
 
 ```
- step  what happens                      kernel            written up in
- 1     query vector -> 32-bit code       encoder           part 4
- 2     compare with every key's code     Hamming score     part 1  <- this post
- 3     keep the best k keys              top-k             part 2
- 4     attention over only those keys    sparse attention  part 3
-       all four at Llama-3.1-8B shapes   end to end        part 5
+ part  what happens                      kernel
+ 1     query vector -> 32-bit code       encoder
+ 2     compare with every key's code     Hamming score  <- this post
+ 3     keep the best k keys              top-k
+ 4     attention over only those keys    sparse attention
+ 5     all four at Llama-3.1-8B shapes   end to end
 ```
 
-The encoder runs first but gets written last, since the other kernels can be tested with random codes.
+Part 1 builds the encoder that makes the 32-bit codes. This post assumes the codes exist and tests with random ones.
 The series stops at HashAttention. vAttention's sampling and the Quest and Double Sparsity scorers are out of
 scope for now.
 
@@ -261,7 +261,7 @@ The lesson I'm keeping: profile first and find which limit you're at. When Nsigh
 compute units are at 29%, any optimization that doesn't move fewer bytes is wasted work. I found that out by
 writing two of them.
 
-Part 2 is top-k: picking the best keys from these scores with a histogram instead of a sort, since a score can
+Part 3 is top-k: picking the best keys from these scores with a histogram instead of a sort, since a score can
 only be 0 to 32. It's also the kernel the scores could later be fused into, so they never get written at all.
 
 HashAttention paper: [arXiv 2412.14468](https://arxiv.org/abs/2412.14468) (Desai et al., ICML 2025).

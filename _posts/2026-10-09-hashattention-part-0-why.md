@@ -60,29 +60,28 @@ Then the method keeps the best k keys, say 1,000 out of 32,000, and runs normal 
 ## The four kernels
 
 ```
- step  what happens                      kernel            written up in
- 1     query vector -> 32-bit code       encoder           part 4
- 2     compare with every key's code     Hamming score     part 1
- 3     keep the best k keys              top-k             part 2
- 4     attention over only those keys    sparse attention  part 3
-       all four at Llama-3.1-8B shapes   end to end        part 5
+ part  what happens                      kernel
+ 1     query vector -> 32-bit code       encoder
+ 2     compare with every key's code     Hamming score
+ 3     keep the best k keys              top-k
+ 4     attention over only those keys    sparse attention
+ 5     all four at Llama-3.1-8B shapes   end to end
 ```
 
 | Part | Kernel | What's new in CUDA terms |
 |---|---|---|
-| 1 | Hamming score | one thread per key, popcount, measuring against memory bandwidth |
-| 2 | Top-k | histograms with atomics, prefix sums, writing out a variable-length list |
-| 3 | Sparse attention | gathering keys by index, online softmax, splitting one query across the whole GPU |
-| 4 | Encoder | matrix-vector multiply, packing 32 signs into one int with a warp instruction |
+| 1 | Encoder | matrix-vector multiply, packing 32 signs into one int with a warp instruction |
+| 2 | Hamming score | one thread per key, popcount, measuring against memory bandwidth |
+| 3 | Top-k | histograms with atomics, prefix sums, writing out a variable-length list |
+| 4 | Sparse attention | gathering keys by index, online softmax, splitting one query across the whole GPU |
 | 5 | End to end | the whole decode step, timed and checked against dense attention |
 
-Part 3 is the hardest by a wide margin. Part 4 comes last even though it runs first, because the other kernels
-can be tested with random codes, and that keeps the main path moving.
+The parts follow the order the GPU runs them. Part 4 is the hardest by a wide margin.
 
 ## What I'll measure, and what I won't
 
 Each part gets a PyTorch reference first, then the CUDA kernel, checked against the reference on every run, then
-timings with Nsight Compute and the same "how close is this to the hardware limit" question as part 1.
+timings with Nsight Compute and the same "how close is this to the hardware limit" question as part 2.
 
 Two limits up front:
 
@@ -91,6 +90,6 @@ Two limits up front:
 - **Random hash first.** HashAttention learns its hash from data. I start with a random projection, which needs no
   training, and treat learned weights as a later step. The kernel is identical either way.
 
-[Part 1]({{ site.baseurl }}{% post_url 2026-10-09-hashattention-part-1-hamming %}), the Hamming score kernel, is already done: 117x faster than a PyTorch loop, at 94% of the GPU's memory
+[Part 2]({{ site.baseurl }}{% post_url 2026-10-09-hashattention-part-2-hamming %}), the Hamming score kernel, is already done: 117x faster than a PyTorch loop, at 94% of the GPU's memory
 bandwidth.
 
