@@ -12,6 +12,41 @@ a single CUDA instruction per key, and it runs at 94% of my GPU's memory bandwid
 classic CUDA optimizations, shared memory and constant memory, and measured exactly zero gain. Working out why they
 didn't help taught me more than the speedup did.
 
+## This is part 1 of a series
+
+I'm building one sparse-attention decode step from scratch, one kernel at a time, and writing up each kernel as I
+go. The full step has three stages:
+
+```
+new query + all cached keys
+        |
+        v
+ 1. score every key cheaply        <- this post: Hamming scores
+        |
+        v
+ 2. keep only the top-k keys       <- top-k selection with a histogram
+        |
+        v
+ 3. attention over those k keys    <- sparse FlashDecoding
+        |
+        v
+ output, close to full attention at a fraction of the reads
+```
+
+Along the way I'll also write two other ways to do stage 1 (Quest's page scoring and Double Sparsity's
+channel scoring) and vAttention's method for deciding how large k needs to be. The last post chains stages 1, 2
+and 3 at Llama-3.1-8B shapes and compares speed and accuracy against dense attention.
+
+| Part | Kernel | Stage |
+|---|---|---|
+| 1 | Hamming score (HashAttention) | 1 |
+| 2 | Page scoring (Quest) | 1, alternative |
+| 3 | Channel scoring (Double Sparsity) | 1, alternative |
+| 4 | Top-k by histogram | 2 |
+| 5 | Sample budget (vAttention) | 2, add-on |
+| 6 | Sparse FlashDecoding | 3 |
+| 7 | The whole step, end to end | 1 to 3 |
+
 ## The kernel: Hamming scores for HashAttention
 
 HashAttention gives every key a learned 32-bit code. A key looks relevant when its code agrees with the query's
@@ -238,7 +273,8 @@ The lesson I'm keeping: profile first and find which limit you're at. When Nsigh
 compute units are at 29%, any optimization that doesn't move fewer bytes is wasted work. I found that out by
 writing two of them.
 
-Next is the top-k selection step, which is where fusing away the score writes becomes possible.
+Part 2 is Quest's page scoring, which needs my first real reduction kernel. The score-write fusion from the
+list above has to wait for part 4, top-k, since that's the kernel the scores would be fused into.
 
 Code: <!-- link to repo once public -->
 
