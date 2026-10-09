@@ -2,3 +2,8 @@
 animations/out/
 media/
 __pycache__/
+_site/
+.jekyll-cache/
+.bundle/
+vendor/
+Gemfile.lock
