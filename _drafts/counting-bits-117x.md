@@ -134,20 +134,30 @@ Two measurement traps showed up along the way:
 
 ## The fair comparison: CPU vs GPU
 
-| Version | 67M keys |
-|---|---|
-| CPU, PyTorch loop (14 threads) | 1,865 ms |
-| CPU, NumPy `bitwise_count` (single core) | 199 ms |
-| GPU, CUDA kernel | 2.46 ms |
+My first CPU comparison said the GPU was 80x faster. It was one run, against single-threaded NumPy, and the
+NumPy code was wrong: `np.bitwise_count` on signed integers counts the bits of the absolute value, so `-1` gives
+1 instead of 32. No error, just wrong scores for every negative code. Viewing the array as `uint32` fixes it.
 
-"80x faster than the CPU" is true and misleading. NumPy's version uses one core of the laptop's 20 logical cores. A
-well-written multi-core CPU version would hit the same wall the GPU did: memory. At a typical laptop DDR5
-bandwidth of roughly 60 to 90 GB/s, moving 537 MB takes about 6 to 9 ms. That's an estimate, not a
-measurement, but it puts the fair GPU advantage for this kernel at around **3x**. That number comes from the ratio of
-memory bandwidths, since neither side is doing much math.
+So I redid it properly: correct results checked against the GPU before timing, 10 runs per case, median with
+min and max. CPU work is split into 1 MB chunks so temporaries stay in cache, and capped at 8 threads.
 
-When a GPU beats a CPU by 80x on memory-bound work, the first thing I'd check now is whether the CPU baseline
-used more than one core.
+| Case (67M keys, 537 MB moved) | Median | Min | Max | GB/s | GPU faster by |
+|---|---|---|---|---|---|
+| GPU, CUDA kernel | 2.54 ms | 2.53 ms | 2.55 ms | 212 | |
+| CPU, NumPy, 1 thread | 87.4 ms | 82.5 ms | 91.9 ms | 6 | 34x |
+| CPU, NumPy, 8 threads | 23.8 ms | 22.9 ms | 46.9 ms | 23 | 9.4x |
+| CPU, plain copy, 8 threads | 10.3 ms | 9.9 ms | 11.1 ms | 52 | 4.1x |
+
+The last row is the one I care about. It does no math at all, just reads and writes the same 537 MB, so it's the
+fastest any CPU version of this kernel could possibly be on this laptop. My CPU memory tops out at 52 GB/s. The
+GPU does the whole job at 212 GB/s. **The real ceiling on the GPU's advantage here is about 4x**, the ratio of
+memory bandwidths, because neither side is doing much math.
+
+The 8-thread NumPy version sits at 9.4x because it makes three passes over each chunk and only reaches 23 GB/s.
+A hand-written C++ loop could close some of that gap. It can't get past 4x.
+
+Two other things the 10 runs showed. The GPU was steady (2.53 to 2.55 ms). The CPU wasn't: one 8-thread run
+took 46.9 ms, twice the median. With a single run I could have reported almost any number I wanted.
 
 ## Then I tried shared memory and constant memory
 
@@ -221,7 +231,8 @@ The kernel can only get faster by moving fewer bytes. These are predictions; I h
 - Lookup table: 61 ms. About 15 passes.
 - CUDA with `__popc`: 2.46 ms, one pass, 94% of DRAM bandwidth according to Nsight Compute.
 - Shared memory and constant memory: 0% gain, because they don't reduce bytes read from DRAM.
-- CPU vs GPU: 80x against a single-core baseline, about 3x against an estimated well-tuned CPU.
+- CPU vs GPU: 34x against single-threaded NumPy, 9.4x against 8 threads, and a measured ceiling of about 4x set
+  by memory bandwidth (52 GB/s CPU vs 212 GB/s GPU).
 
 The lesson I'm keeping: profile first and find which limit you're at. When Nsight says DRAM is 94% busy and the
 compute units are at 29%, any optimization that doesn't move fewer bytes is wasted work. I found that out by
