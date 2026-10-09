@@ -20,7 +20,8 @@ Take Llama-3.1-8B. Its attention has 32 layers, 8 key/value heads per layer, and
 16-bit floats, each token adds this to the cache:
 
 ```
-32 layers x 8 heads x 128 numbers x 2 (key and value) x 2 bytes = 131,072 bytes = 128 KB per token
+32 layers x 8 heads x 128 numbers x 2 (key and value) x 2 bytes
+= 131,072 bytes = 128 KB per token
 ```
 
 At a 32K-token context that's **4 GB**{: .slow}, and generating the next token reads all of it. My laptop GPU (RTX 2000 Ada,
