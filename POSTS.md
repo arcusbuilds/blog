@@ -3,6 +3,21 @@
 Each post: full version here on the blog, short version on LinkedIn (link in first comment) and X (thread, link in last tweet).
 Status: `ready` = numbers/material already exist, `later` = needs the work first.
 
+## Series 1: HashAttention from scratch (scope locked 9 Oct 2026)
+
+Scope = HashAttention only. vAttention sampling, Quest, Double Sparsity are out (maybe a later series).
+
+| Part | Post | Status |
+|---|---|---|
+| 0 | Why a language model rereads its whole memory for every word (the map) | draft `_drafts/hashattention-part-0-why.md` |
+| 1 | Hamming score: 117x faster than PyTorch, then 0% with shared memory | draft `_drafts/hashattention-part-1-hamming.md` |
+| 2 | Top-k by histogram | kernel in progress |
+| 3 | Sparse attention (gather + online softmax + split-K) | later |
+| 4 | Hash encoder (GEMV + ballot bit-pack) | later |
+| 5 | End to end at Llama-3.1-8B shapes vs dense attention | later |
+
+The tables below are the wider idea pool; many rows become sections inside the series parts above.
+
 ## Rung 1: Hamming score (material ready)
 
 | # | Post | Status |

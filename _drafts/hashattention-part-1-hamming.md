@@ -1,5 +1,5 @@
 ---
-title: "117x faster than PyTorch, then 0% faster with shared memory"
+title: "HashAttention from scratch, part 1: 117x faster than PyTorch, then 0% faster with shared memory"
 author: Srijan Keshri
 ---
 
@@ -14,47 +14,19 @@ didn't help taught me more than the speedup did.
 
 ## This is part 1 of a series
 
-I'm building one sparse-attention decode step from scratch, one kernel at a time, and writing up each kernel as I
-go. The simplest version, the one from the HashAttention paper, has three stages:
+I'm building HashAttention's decode step from scratch in CUDA, one kernel per post. Part 0 explains why sparse
+attention matters and what the full plan is. The short version:
 
 ```
-new query + all cached keys
-        |
-        v
- 1. score every key cheaply        <- this post: Hamming scores
-        |
-        v
- 2. keep only the top-k keys       <- top-k selection with a histogram
-        |
-        v
- 3. attention over those k keys    <- sparse FlashDecoding
-        |
-        v
- output, close to full attention at a fraction of the reads
+ query vector -> 32-bit code      encoder           part 4
+ compare with every key's code    Hamming score     part 1  <- this post
+ keep the best k keys             top-k             part 2
+ attention over only those keys   sparse attention  part 3
+ all four at Llama-3.1-8B shapes  end to end        part 5
 ```
 
-That's the minimum, and it leaves two things out. First, the scores need 32-bit codes to exist: a small learned
-hash turns the query and each new key into bits, and that encoder is a kernel of its own. Second, vAttention
-(Desai et al., arXiv 2510.05688), the paper that got me into this, adds more steps after scoring. It always keeps
-the first few tokens and a window of recent ones, picks the top-k, then randomly samples from the keys that are
-left. It uses the mean and variance of a small sample to decide how many samples it needs for a target error, and
-gives the sampled keys extra weight in the softmax so they stand in for the ones it skipped. That sampling step is
-where its error guarantee comes from.
-
-So the series covers both: the three-stage HashAttention pipeline first, then the vAttention additions. I'll
-also write two other ways to do stage 1 (Quest's page scoring and Double Sparsity's channel scoring). The last
-post chains everything at Llama-3.1-8B shapes and compares speed and accuracy against dense attention.
-
-| Part | Kernel | Stage |
-|---|---|---|
-| 1 | Hamming score (HashAttention) | 1 |
-| 2 | Page scoring (Quest) | 1, alternative |
-| 3 | Channel scoring (Double Sparsity) | 1, alternative |
-| 4 | Top-k by histogram | 2 |
-| 5 | Sample budget and random sampling (vAttention) | 2, add-on |
-| 6 | Sparse FlashDecoding with sample weights | 3 |
-| 7 | Hash encoder: query and keys to 32-bit codes | before 1 |
-| 8 | The whole step, end to end | all |
+The series stops at HashAttention. vAttention's sampling and the Quest and Double Sparsity scorers are out of
+scope for now.
 
 ## The kernel: Hamming scores for HashAttention
 
@@ -282,8 +254,8 @@ The lesson I'm keeping: profile first and find which limit you're at. When Nsigh
 compute units are at 29%, any optimization that doesn't move fewer bytes is wasted work. I found that out by
 writing two of them.
 
-Part 2 is Quest's page scoring, which needs my first real reduction kernel. The score-write fusion from the
-list above has to wait for part 4, top-k, since that's the kernel the scores would be fused into.
+Part 2 is top-k: picking the best keys from these scores with a histogram instead of a sort, since a score can
+only be 0 to 32. It's also the kernel the scores could later be fused into, so they never get written at all.
 
 Code: <!-- link to repo once public -->
 
